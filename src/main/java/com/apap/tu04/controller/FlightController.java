@@ -45,10 +45,10 @@ public class FlightController {
         binder.registerCustomEditor(Date.class, null,  new CustomDateEditor(dateFormat, true));
     }
 
-    @RequestMapping(value = "/flight/delete/{flightId}/{pilotId}", method = RequestMethod.GET)
-    private String delete(@PathVariable(value = "flightId") Long flightId, @PathVariable(value="pilotId") Long pilotId ,Model model){
+    @RequestMapping(value = "/flight/delete/{flightId}/{pilotLicenseNumber}", method = RequestMethod.GET)
+    private String delete(@PathVariable(value = "flightId") Long flightId, @PathVariable(value="pilotLicenseNumber") String licenseNumber ,Model model){
         flightService.deleteFlight(flightId);
-        return "redirect:/pilot/view?licenseNumber="+pilotId;
+        return "redirect:/pilot/view?licenseNumber="+ licenseNumber;
     }
 
     @RequestMapping(value = "/flight/update/{flightId}", method = RequestMethod.GET)

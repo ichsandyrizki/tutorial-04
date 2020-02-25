@@ -48,7 +48,7 @@ tr:nth-child(even) {
             <td th:text="${flight.destination}"></td>
             <td th:text="${flight.time}"></td>
             <td>
-                <a th:href="@{/flight/delete/}+${flight.id}+'/'+${pilot.id}">Delete </a>
+                <a th:href="@{/flight/delete/}+${flight.id}+'/'+${pilot.licenseNumber}">Delete </a>
                 <a th:href="@{/flight/update/}+${flight.id}"> Update </a>
             </td>
         </tr>
