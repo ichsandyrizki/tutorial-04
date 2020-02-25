@@ -5,17 +5,20 @@ import com.apap.tu04.model.PilotModel;
 import com.apap.tu04.service.FlightService;
 import com.apap.tu04.service.PilotService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Controller
 public class FlightController {
     @Autowired
-    private FlightService fligtService;
+    private FlightService flightService;
 
     @Autowired
     private PilotService pilotService;
@@ -29,9 +32,37 @@ public class FlightController {
         return "addFlight";
     }
     @RequestMapping(value = "/flight/add", method = RequestMethod.POST)
-    private String addFlightSubmit(@ModelAttribute FlightModel flight){
-        fligtService.addFlight(flight);
-        return "add";
+    private String addFlightSubmit(@ModelAttribute FlightModel flight, Model model){
+        flightService.addFlight(flight);
+        model.addAttribute("message", "Flight Berhasil Dimasukan!");
+        return "redirect:/pilot/view?licenseNumber="+flight.getPilot().getLicenseNumber();
+    }
+    @InitBinder
+    public void initBinder(HttpServletRequest request, ServletRequestDataBinder binder)
+    {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        binder.registerCustomEditor(Date.class, null,  new CustomDateEditor(dateFormat, true));
     }
 
+    @RequestMapping(value = "/flight/delete/{flightId}/{pilotId}", method = RequestMethod.GET)
+    private String delete(@PathVariable(value = "flightId") Long flightId, @PathVariable(value="pilotId") Long pilotId ,Model model){
+        flightService.deleteFlight(flightId);
+        return "redirect:/pilot/view?licenseNumber="+pilotId;
+    }
+
+    @RequestMapping(value = "/flight/update/{flightId}", method = RequestMethod.GET)
+    private String update(@PathVariable(value = "flightId") Long flightId, Model model){
+        FlightModel flight = flightService.findById(flightId);
+        model.addAttribute("flight", flight);
+        return "updateFlight";
+    }
+
+    @RequestMapping(value = "flight/update", method = RequestMethod.POST)
+    private String updateFlightSubmit(@ModelAttribute FlightModel flightModel, Model model){
+        flightService.updateFlight(flightModel);
+        return "redirect:/pilot/view?licenseNumber="+flightModel.getPilot().getLicenseNumber();
+    }
 }
+
+
